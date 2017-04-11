@@ -31,7 +31,6 @@ class SqlManager(Singleton):
 	__userName = ''
 	__password = ''
 	__charSet = ''
-	__port = None
 	
 	def __init__(self):#,database_name,host,user_name,password,char_set):
 		pass
@@ -47,7 +46,7 @@ class SqlManager(Singleton):
 	def __del__(self):
 		self.closeConnect()
 	
-	def setConnect(self, database_name, host_name, user_name, password, char_set, port = 3306):
+	def setConnect(self, database_name, host_name, user_name, password, char_set):
 		if self.__db != None:
 			print 'you have connected to mysql database!\nPlease disconnect and then setConnect!'
 			return
@@ -57,8 +56,7 @@ class SqlManager(Singleton):
 		self.__password = password
 		self.__charSet = char_set
 		self.__mutex = threading.Lock()
-		self.__port = port
-		self.__db = MySQLdb.connect(host = host_name, user = user_name, passwd = password, db = database_name, charset = char_set, port = port)
+		self.__db = MySQLdb.connect(host = host_name, user = user_name, passwd = password, db = database_name, charset = char_set)		
 	
 	def getCursor(self):#获取游标
 		if self.__db != None:
@@ -121,7 +119,7 @@ class SqlManager(Singleton):
 		self.__mutex.release()
 		return result
 		
-	def __insert(self, sql, parameters = None):
+	def insertTable(self, sql, parameters = None):
 		print sql,	self.isConnect()
 		if (not self.isConnect()) or sql == '':				
 			return False
@@ -137,7 +135,7 @@ class SqlManager(Singleton):
 			'''if sql.find('NAME'):
 				parameters[2] = '格式错误'
 				self.__mutex.release()
-				self.__insert(sql, parameters)
+				self.insertTable(sql, parameters)
 				self.__mutex.acquire()'''		
 			print '发生错误时回滚', e
 			try:
@@ -148,39 +146,17 @@ class SqlManager(Singleton):
 					self.closeConnect()
 					self.__db = MySQLdb.connect(host = self.__host, user = self.__userName, passwd = self.__password, db = self.__databaseName, charset = self.__charSet)
 					self.__mutex.release()					
-					return self.__insert(sql, parameters)
+					return self.insertTable(sql, parameters)
 				print "Error: rollback error", e# 发生错误时回滚
 		cursor.close()
 		self.__mutex.release()
 		return True
-
-	def insertTable(self, table_name, **dictArg):
-		if len(dictArg) == 0:
-			return False
-		sql = "insert into %s(" %table_name
-		parameters = list()
-		for key in dictArg:
-			sql += key + ','
-			parameters.append(dictArg[key])
-		sql = sql.strip(' ,')	
-		sql += ") values(" + r"%s" + r",%s" * (count -1) + ")"
-		print sql
-		return self.__insert(sql, parameters)
 		
-	def updateTable(self, table_name, condition, **dictArg):
-		if len(dictArg) == 0:
-			return False
-		sql = "update %s set " %table_name
-		parameters = list()
-		for key in dictArg:
-			sql += key + r' = %s, '
-			paramters.append(dictArg[key])
-		sql = sql.strip(' ,')
-		sql += condition
-		return self.__insert(sql, parameters)
+	def updateTable(self,sql, parameters = None):
+		return self.insertTable(sql,parameters)		
 	
 	def deleteData(self,sql, parameters = None):
-		return self.__insert(sql,parameters)
+		return self.insertTable(sql,parameters)
 	
 	def showConnect(self):
 		print '数据库连接信息:', __databaseName, __host, __userName, __charSet
