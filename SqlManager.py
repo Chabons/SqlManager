@@ -109,7 +109,7 @@ class SqlManager(Singleton):
 		self.__mutex.acquire()
 		cursor = self.__db.cursor()
 		if sql == None and table_name != None:
-			sql = "select *form %s"%table_name	
+			sql = "select *from %s"%table_name	
 		try:
 			cursor.execute(sql)
 			result = cursor.fetchall()
@@ -174,9 +174,9 @@ class SqlManager(Singleton):
 		parameters = list()
 		for key in dictArg:
 			sql += key + r' = %s, '
-			paramters.append(dictArg[key])
+			parameters.append(dictArg[key])
 		sql = sql.strip(' ,')
-		sql += condition
+		sql += " " + condition
 		return self.__insert(sql, parameters)
 	
 	def deleteData(self,sql, parameters = None):
@@ -281,7 +281,7 @@ def main(argv):
 	sqlManager.setConnect(DATABASE_NAME,HOST,USER_NAME,PASSWORD,CHAR_SET)
 	sqlManager.showDatabases()
 	sqlManager.showTables()
-	print sqlManager.queryTable(sql="select *from %s where login_key = %s"%("TB_USER_LOGIN",1))
+	print sqlManager.queryTable(sql = "select *from TB_USER_SING limit 10")
 
 if __name__ == '__main__':
 	main(sys.argv)	
