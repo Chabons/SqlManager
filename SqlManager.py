@@ -127,19 +127,17 @@ class SqlManager(Singleton):
 			return False
 		self.__mutex.acquire()
 		cursor = self.__db.cursor()
+		flag = False
 		try:
 			if parameters == None:
 				cursor.execute(sql)				
 			else:				
 				cursor.execute(sql,parameters)
 			self.__db.commit()# 提交到数据库执行
+			flag = True
 		except Exception, e:
-			'''if sql.find('NAME'):
-				parameters[2] = '格式错误'
-				self.__mutex.release()
-				self.__insert(sql, parameters)
-				self.__mutex.acquire()'''		
 			print '发生错误时回滚', e
+			flag = False
 			try:
 				self.__db.rollback()
 			except Exception, e:
@@ -152,7 +150,7 @@ class SqlManager(Singleton):
 				print "Error: rollback error", e# 发生错误时回滚
 		cursor.close()
 		self.__mutex.release()
-		return True
+		return flag
 
 	def insertTable(self, table_name, **dictArg):
 		if len(dictArg) == 0:
