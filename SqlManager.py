@@ -90,8 +90,8 @@ class SqlManager(Singleton):
 		try:	
 			cursor.execute(sql)
 			self.__db.commit()
-		except:
-			print "Error: unable to create table"
+		except Exception, e:
+			print "Error: unable to create table", e
 			try:
 				self.__db.rollback()
 			except Exception, e:
@@ -115,8 +115,8 @@ class SqlManager(Singleton):
 			result = cursor.fetchall()
 			for row in result:
 				print row
-		except:
-			print "Error: unable to fecth data"
+		except Exception ,e :
+			print "Error: unable to fecth data" , e
 		cursor.close()
 		self.__mutex.release()
 		return result
@@ -196,8 +196,8 @@ class SqlManager(Singleton):
 			print result
 			for raw in result:
 				print raw			
-		except:
-			print 'showTables error'
+		except Exception, e:
+			print 'showTables error', e
 		cursor.close()
 		self.__mutex.release()
 		return result
@@ -212,8 +212,8 @@ class SqlManager(Singleton):
 			result = cursor.fetchall()
 			for raw in result:
 			 print raw
-		except:
-			print 'showDatabases error'
+		except Exception, e:
+			print 'showDatabases error', e
 		cursor.close()
 		
 	def showTableStruct(self, table_name):
@@ -227,8 +227,8 @@ class SqlManager(Singleton):
 			result = cursor.fetchall()
 			for raw in result:
 			 print raw
-		except:
-			print 'showTableStruct error'
+		except Exception, e:
+			print 'showTableStruct error', e
 		cursor.close()
 		self.__mutex.release()
 
