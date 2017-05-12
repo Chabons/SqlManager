@@ -117,6 +117,12 @@ class SqlManager(Singleton):
 				print row
 		except Exception ,e :
 			print "Error: unable to fecth data" , e
+		  	if(e[0] == 2006):					
+					cursor.close()
+					self.closeConnect()
+					self.__db = MySQLdb.connect(host = self.__host, user = self.__userName, passwd = self.__password, db = self.__databaseName, charset = self.__charSet)
+					self.__mutex.release()					
+					return self.queryTable(table_name, sql)
 		cursor.close()
 		self.__mutex.release()
 		return result
